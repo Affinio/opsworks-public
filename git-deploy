@@ -1,0 +1,23 @@
+#!/bin/sh
+
+STACKID=00000000-0000-0000-0000-000000000000
+LAYERID=00000000-0000-0000-0000-000000000000
+DEVAPPID=00000000-0000-0000-0000-000000000000
+APPID=00000000-0000-0000-0000-000000000000
+
+case "$1" in
+
+"app-dev")
+INSTANCES=`aws opsworks --region us-east-1 describe-instances --layer-id $LAYERID | jq ".Instances[].InstanceId" | paste -s -d, -`
+DEPLOYCMD="aws opsworks --region us-east-1 create-deployment --stack-id=$STACKID --app-id=$DEVAPPID --instance-ids=[$INSTANCES] --command={\"Name\":\"deploy\"}"
+echo `$DEPLOYCMD`
+;;
+"app")
+INSTANCES=`aws opsworks --region us-east-1 describe-instances --layer-id $LAYERID | jq ".Instances[].InstanceId" | paste -s -d, -`
+DEPLOYCMD="aws opsworks --region us-east-1 create-deployment --stack-id=$STACKID --app-id=$APPID --instance-ids=[$INSTANCES] --command={\"Name\":\"deploy\"}"
+echo `$DEPLOYCMD`
+;;
+*) echo "bad type"
+;;
+
+esac
